@@ -1,0 +1,136 @@
+17t9jv5bohk2ta39bfsavpevd609fufjtqak6is76hvgfs54e1spackage com.gmc.em.authentication;
+
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.Random;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
+
+import org.springframework.stereotype.Component;
+
+import net.minidev.json.JSONObject;
+
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.Payload;
+import com.nimbusds.jose.crypto.MACSigner;
+
+@Component
+@Path("/authenticate")
+public class AuthenticationService {
+
+	@Path("/authenticate")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response authenticateUser(UserData userData) {
+
+		try {
+
+			// Authenticate the user using the credentials provided
+			// boolean truOrFalse=
+			// authenticate(userData.getUsername(),userData.getPassword());
+
+			// Issue a token for the user
+			String token = issueToken(userData.getUsername());
+//			JWSObject jwsObject = new JWSObject(new JWSHeader(
+//					(JWSAlgorithm.HS256)), new Payload(getPayLoad(
+//					userData.getUsername(), token)));
+//			jwsObject.sign(new MACSigner(token));
+			// Return the authrization token on the cookie
+			if (authenticate(userData)) {
+				return Response.status(200)
+						.cookie(new NewCookie("gmc_AccessToken", token))// this
+																		// line
+																		// is
+																		// to
+																		// return
+																		// a
+																		// cookie
+																		// to
+																		// browser
+
+						.build();
+			} else {
+				return Response.status(Response.Status.UNAUTHORIZED).entity("{\"success\":false}").build();
+			}
+
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
+	}
+
+//	private JSONObject getPayLoad(String username, String accessToken) {
+//		JSONObject usernameOBJ = new JSONObject();
+//		usernameOBJ.put("Username", username);
+//		usernameOBJ.put("SecureToken", accessToken);
+//		return usernameOBJ;
+//	}
+	@Path("/validUser")
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response isValidUser(UserData userData) {
+
+		try {
+
+			// Authenticate the user using the credentials provided
+			// boolean truOrFalse=
+			// authenticate(userData.getUsername(),userData.getPassword());
+
+			// Issue a token for the user
+			String token = issueToken(userData.getUsername());
+//			JWSObject jwsObject = new JWSObject(new JWSHeader(
+//					(JWSAlgorithm.HS256)), new Payload(getPayLoad(
+//					userData.getUsername(), token)));
+//			jwsObject.sign(new MACSigner(token));
+			// Return the authrization token on the cookie
+			if (authenticate(userData)) {
+				return Response.status(200)
+						.cookie(new NewCookie("gmc_AccessToken", token))// this
+																		// line
+																		// is
+																		// to
+																		// return
+																		// a
+																		// cookie
+																		// to
+																		// browser
+
+						.build();
+			} else {
+				return Response.status(Response.Status.UNAUTHORIZED).entity("{\"success\":false}").build();
+			}
+
+		} catch (Exception e) {
+			return Response.status(Response.Status.UNAUTHORIZED).build();
+		}
+
+	}
+	private String issueToken(String username) {
+
+		Random random = new SecureRandom();
+		String token = new BigInteger(256, random).toString(32);
+		return token;
+	}
+
+	private boolean authenticate(UserData userData) {
+		Boolean result = false;
+		System.out.println(userData.getUsername() + userData.getPassword());
+		if (userData.getUsername().equals("admin")
+				&& userData.getPassword().equals("admin")) {
+			result = true;
+		}
+
+		return result;
+
+	}
+}
