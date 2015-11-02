@@ -1,0 +1,13 @@
+Put Inside Config of App
+        
+        	jwtInterceptorProvider.tokenGetter = ['config', function(config) {
+        	jwtInterceptorProvider.urlParam = 'access_token';//if you remove this, request will go as header Authorization Bearer
+        	var variable="aaannnkkkiiitt";
+        	//below check is there to remove access token while requesting for html templates
+        	if (config.url.substr(config.url.length - 5) == '.html') {
+        	      return null;
+        	    }
+            return variable;
+          }];
+
+          $httpProvider.interceptors.push('jwtInterceptor');
